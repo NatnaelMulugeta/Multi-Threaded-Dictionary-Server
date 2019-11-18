@@ -28,11 +28,10 @@ public class ClientManager {
             this.outputStream=new ObjectOutputStream(this.socket.getOutputStream());
             this.inputStream=new ObjectInputStream(this.socket.getInputStream());
             this.connected=true;
-
             return "Connection established successfully.";
         } catch (Exception e) {
             this.connected=false;
-            return "Unable to connect to the server : "+e.getMessage();
+            return "Unable to connect to the server please make sure the server is started and try again. ";
         }
     }
 
@@ -43,31 +42,20 @@ public class ClientManager {
             this.outputStream.writeObject(message);
             this.outputStream.flush();
             word=(Word)((Message) this.inputStream.readObject()).data;
-        } catch (Exception e) {
-            if(!this.connected){
-                this.initialize_connection();
-            }else{
-                e.printStackTrace();
-            }
-        }
+        }catch (Exception e) { this.connected=false;}
 
         return word;
     }
 
     public boolean addWord(Word word){
+        if(this.getWord(word.getWord())!=null) return false;
         boolean answer=false;
         try {
             Message message=new Message(Commads.ADD,word);
             this.outputStream.writeObject(message);
             this.outputStream.flush();
             answer=(boolean)((Message) this.inputStream.readObject()).data;
-        } catch (Exception e) {
-            if(!this.connected){
-                this.initialize_connection();
-            }else{
-                e.printStackTrace();
-            }
-        }
+        }catch (Exception e) { this.connected=false;}
         return answer;
     }
 
@@ -78,13 +66,7 @@ public class ClientManager {
             this.outputStream.writeObject(message);
             this.outputStream.flush();
             answer=(boolean)((Message) this.inputStream.readObject()).data;
-        } catch (Exception e) {
-            if(!this.connected){
-                this.initialize_connection();
-            }else{
-                e.printStackTrace();
-            }
-        }
+        }catch (Exception e) { this.connected=false;}
         return answer;
     }
 
@@ -95,13 +77,7 @@ public class ClientManager {
             this.outputStream.writeObject(message);
             this.outputStream.flush();
             answer=(boolean)((Message) this.inputStream.readObject()).data;
-        } catch (Exception e) {
-            if(!this.connected){
-                this.initialize_connection();
-            }else{
-                e.printStackTrace();
-            }
-        }
+        }catch (Exception e) { this.connected=false;}
         return answer;
     }
 
@@ -112,15 +88,12 @@ public class ClientManager {
             this.outputStream.writeObject(message);
             this.outputStream.flush();
             meanings=(List) ((Message) this.inputStream.readObject()).data;
-        } catch (Exception e) {
-            if(!this.connected){
-                this.initialize_connection();
-            }else{
-                e.printStackTrace();
-            }
-        }
-
+        } catch (Exception e) {this.connected=false;}
         return meanings;
+    }
+
+    public boolean isConnected(){
+        return this.connected;
     }
 
     public void exit(){
