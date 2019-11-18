@@ -61,7 +61,7 @@ public class IOManager {
     public synchronized Word getWord(String key){
         Word word = new Word();
         try{
-            LinkedHashMap map=(LinkedHashMap) this.words.get(key);
+            LinkedHashMap map=(LinkedHashMap) this.words.get(key.toLowerCase());
             word.setfirst_used((String)map.get("first_used"));
             word.setMeanings((LinkedList)map.get("meanings"));
             word.setOrigin((String)map.get("origin"));
@@ -75,7 +75,7 @@ public class IOManager {
 
     public synchronized boolean addWord(Word word){
         if(this.words==null) return false;
-
+        word.setWord(word.getWord().toLowerCase());
         LinkedHashMap map= this.convert(word);
         this.words.put(word.getWord(),map);
 
@@ -83,13 +83,13 @@ public class IOManager {
     }
 
     public synchronized boolean removeWord(String key){
-        Object obj= this.words.remove(key);
+        Object obj= this.words.remove(key.toLowerCase());
         return obj!=null;
     }
 
     public synchronized boolean replaceWord(Word word){
+        word.setWord(word.getWord().toLowerCase());
         LinkedHashMap map= this.convert(word);
-
         Object obj= this.words.replace(word.getWord(),map);
 
         return obj!=null;
@@ -97,7 +97,8 @@ public class IOManager {
 
     public synchronized List getSuggestion(String key){
         List suggest= new ArrayList<String>();
-        this.words.keySet().forEach((k)->{ if(k.toString().startsWith(key)) suggest.add(k);});
+        if(key.equals("")) return suggest;
+        this.words.keySet().forEach((k)->{ if(k.toString().startsWith(key.toLowerCase())) suggest.add(k);});
         return suggest;
     }
 
@@ -111,13 +112,5 @@ public class IOManager {
 
         return map;
     }
-
-
-    public static void main(String[] arg) {
-        DictionaryServer server= new DictionaryServer(7789);
-        server.initialize_server();
-        server.start_server();
-    }
-
 
 }
